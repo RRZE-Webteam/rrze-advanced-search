@@ -1,2 +1,2 @@
-# rrze-advanced-search
+# RRZE Erweiterte Suche
 Erweiterung der Suchfunktion von WordPress.

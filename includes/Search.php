@@ -124,7 +124,7 @@ class Search
         $query->set('orderby', 'relevance');
 
         if (in_array($this->options->order, array('DESC', 'ASC'), true) && $this->options->order !== 'DESC') {
-            $query->set('order', $this->options['order']);
+            $query->set('order', $this->options->order);
         }
     }
 

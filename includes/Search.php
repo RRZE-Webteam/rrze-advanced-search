@@ -19,7 +19,7 @@ class Search
     public function onLoaded()
     {
         add_filter('posts_search', [$this, 'postSearch'], 999, 2);
-        add_filter('posts_orderby', [$this, 'postsOrderby'], 999, 2);        
+        add_filter('posts_orderby', [$this, 'postsOrderby'], 999, 2);
         add_action('pre_get_posts', [$this, 'preGetPosts'], 999);
     }
 
@@ -30,13 +30,13 @@ class Search
         if (empty($search) || !empty($query->query_vars['suppress_filters'])) {
             return $search;
         }
+        $searchTerms = (array) $query->query_vars['search_terms'];
 
         $search = '';
         $searchAnd = '';
-
         $termsRelationType = 'AND';
 
-        foreach ((array) $query->query_vars['search_terms'] as $term) {
+        foreach ($searchTerms as $term) {
             $term = $wpdb->esc_like($term);
             $term1 = $term . '%';
             $term2 = '%' . $term . '%';
@@ -44,28 +44,24 @@ class Search
             $searchOr = '';
             $search .= "{$searchAnd} (";
 
-            if (!empty($this->options->columns['title'])) {
-                $search .= $wpdb->prepare("($wpdb->posts.post_title LIKE '%s')", $term1);
-                $searchOr = ' OR ';
-                $search .= $searchOr;
-                $search .= $wpdb->prepare("($wpdb->posts.post_title LIKE '%s')", $term2);
-                $searchOr = ' OR ';
-                $search .= $searchOr;
-                $search .= $wpdb->prepare("($wpdb->posts.post_title LIKE '%s')", $term3);
-                $searchOr = ' OR ';                               
-            }
+            $search .= $wpdb->prepare("($wpdb->posts.post_title LIKE '%s')", $term1);
+            $searchOr = ' OR ';
+            $search .= $searchOr;
+            $search .= $wpdb->prepare("($wpdb->posts.post_title LIKE '%s')", $term2);
+            $searchOr = ' OR ';
+            $search .= $searchOr;
+            $search .= $wpdb->prepare("($wpdb->posts.post_title LIKE '%s')", $term3);
+            $searchOr = ' OR ';
 
-            if (!empty($this->options->columns['content'])) {
-                $search .= $searchOr;
-                $search .= $wpdb->prepare("($wpdb->posts.post_content LIKE '%s')", $term1);
-                $searchOr = ' OR ';
-                $search .= $searchOr;
-                $search .= $wpdb->prepare("($wpdb->posts.post_content LIKE '%s')", $term2);
-                $searchOr = ' OR ';
-                $search .= $searchOr;
-                $search .= $wpdb->prepare("($wpdb->posts.post_content LIKE '%s')", $term3);
-                $searchOr = ' OR ';                                
-            }
+            $search .= $searchOr;
+            $search .= $wpdb->prepare("($wpdb->posts.post_content LIKE '%s')", $term1);
+            $searchOr = ' OR ';
+            $search .= $searchOr;
+            $search .= $wpdb->prepare("($wpdb->posts.post_content LIKE '%s')", $term2);
+            $searchOr = ' OR ';
+            $search .= $searchOr;
+            $search .= $wpdb->prepare("($wpdb->posts.post_content LIKE '%s')", $term3);
+            $searchOr = ' OR ';
 
             if (!empty($this->options->columns['excerpt'])) {
                 $search .= $searchOr;
@@ -113,27 +109,31 @@ class Search
         return $search;
     }
 
-    public function postsOrderby($orderby, $query) 
+    public function postsOrderby($orderby, $query)
     {
         global $wpdb;
         if (empty($query->is_search) || empty($query->get('s')) || !empty($query->query_vars['suppress_filters'])) {
             return $orderby;
         }
-        $order = in_array($this->options->order, ['DESC', 'ASC']) ? $this->options->order : 'DESC';
+        $searchTerms = (array) $query->query_vars['search_terms'];
+        $order = in_array($this->options->order, ['none', 'DESC', 'ASC']) ? $this->options->order : 'none';
+        $orderStr = $order != 'none' ? ", $wpdb->posts.post_modified {$order}" : '';
+
         $orderby = '(CASE ';
-        foreach ((array) $query->query_vars['search_terms'] as $term) {
+        foreach ($searchTerms as $term) {
             $term = $wpdb->esc_like($term);
-            $term1 = $term . '%';
-            $term2 = '%' . $term . '%';
-            $term3 = '%' . $term;        
-            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_title LIKE '%s' THEN 1 ", $term1);
-            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_title LIKE '%s' THEN 2 ", $term2);
-            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_content LIKE '%s' THEN 3 ", $term1);            
-            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_title LIKE '%s' THEN 4 ", $term3);
-            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_content LIKE '%s' THEN 5 ", $term2);
-            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_content LIKE '%s' THEN 6 ", $term3);                        
+            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_title LIKE '%s' THEN 1 ", $term . '%');
+            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_title LIKE '%s' THEN 2 ", '%' . $term . '%');
+            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_title LIKE '%s' THEN 3 ", '%' . $term);
         }
-        $orderby .= "ELSE 7 END), $wpdb->posts.post_modified {$order}";       
+        foreach ($searchTerms as $term) {
+            $term = $wpdb->esc_like($term);
+            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_content LIKE '%s' THEN 4 ", $term . '%');
+            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_content LIKE '%s' THEN 5 ", '%' . $term . '%');
+            $orderby .= $wpdb->prepare("WHEN $wpdb->posts.post_content LIKE '%s' THEN 6 ", '%' . $term);
+        }        
+        $orderby .= "ELSE 10 END){$orderStr}";
+
         return $orderby;
     }
 

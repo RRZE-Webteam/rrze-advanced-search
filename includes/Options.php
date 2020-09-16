@@ -30,7 +30,7 @@ class Options
             'meta_keys' => [],
             'taxonomies' => [],
             'posts_per_page' => 20,
-            'order' => 'DESC'
+            'order' => 'none'
         ];
 
         return $options;

@@ -149,11 +149,12 @@ class Settings
 
     public function orderField()
     {
-        echo '<fieldset>';
         echo '<legend class="screen-reader-text">', __('Result Order', 'rrze-advanced-search'), '</legend>';
-        echo '<label><input type="radio" name="', $this->optionName, '[order]" id="advanced-search-order-desc" value="DESC" ', checked($this->options->order, 'DESC'), '>', __('Descending', 'rrze-advanced-search'), '</label><br>';
-        echo '<label><input type="radio" name="', $this->optionName, '[order]" id="advanced-search-order-asc" value="ASC" ', checked($this->options->order, 'ASC'), '>', __('Ascending', 'rrze-advanced-search'), '</label>';
-        echo '</fieldset>';
+        echo '<select name="', $this->optionName, '[order]" id="advanced-search-order">';
+        echo '<option value="none" ', selected($this->options->order, 'none'). '>', __('None', 'rrze-advanced-search'), '</option>';
+        echo '<option value="DESC" ', selected($this->options->order, 'DESC'). '>', __('Descending', 'rrze-advanced-search'), '</option>';
+        echo '<option value="ASC" ', selected($this->options->order, 'ASC'). '>', __('Ascending', 'rrze-advanced-search'), '</option>';
+        echo '</select>';
     }
 
     public function postsPerPageField()
@@ -206,7 +207,7 @@ class Settings
         $postsPerPage = !empty($input['posts_per_page']) ? absint($input['posts_per_page']) : 20;
         $input['posts_per_page'] = $postsPerPage >= 5 ? $postsPerPage : 20;
 
-        $input['order'] = !empty($input['order']) && in_array($input['order'], ['DESC', 'ASC']) ? $input['order'] : 'DESC';
+        $input['order'] = !empty($input['order']) && in_array($input['order'], ['none', 'DESC', 'ASC']) ? $input['order'] : 'none';
 
         return $input;
     }

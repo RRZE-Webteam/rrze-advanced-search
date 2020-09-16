@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: RRZE Advanced Search\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-14 07:18+0000\n"
+"POT-Creation-Date: 2020-09-16 08:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -62,11 +62,11 @@ msgstr ""
 msgid "Taxonomies"
 msgstr ""
 
-#: includes/Settings.php:65 includes/Settings.php:153
+#: includes/Settings.php:65 includes/Settings.php:152
 msgid "Result Order"
 msgstr ""
 
-#: includes/Settings.php:66 includes/Settings.php:162
+#: includes/Settings.php:66 includes/Settings.php:163
 msgid "Posts Per Page"
 msgstr ""
 
@@ -103,10 +103,14 @@ msgid "Search Result"
 msgstr ""
 
 #: includes/Settings.php:154
-msgid "Descending"
+msgid "None"
 msgstr ""
 
 #: includes/Settings.php:155
+msgid "Descending"
+msgstr ""
+
+#: includes/Settings.php:156
 msgid "Ascending"
 msgstr ""
 

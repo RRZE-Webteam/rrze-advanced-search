@@ -55,7 +55,8 @@ class Functions
 			WHERE $wpdb->posts.post_type = '%s' 
 			AND $wpdb->postmeta.meta_key != '' 
 			AND $wpdb->postmeta.meta_key NOT RegExp '(^[_0-9].+$)' 
-			AND $wpdb->postmeta.meta_key NOT RegExp '(^[0-9]+$)'";
+			AND $wpdb->postmeta.meta_key NOT RegExp '(^[0-9]+$)' 
+			AND $wpdb->postmeta.meta_value RegExp '(^.*[a-zA-Z0-9_].*\\s.*[a-zA-Z0-9_].*$)'";
 		return $wpdb->get_col($wpdb->prepare($query, $postType));
 	}
 }
